@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -e
+
 function help() {
   echo "Usage: up.sh [user@ip-address] [domain]"
   echo "Example: up.sh tonytino@1.2.3.4"
@@ -15,7 +17,7 @@ ssh_target=$1
 domain=$2
 
 echo "Cloning the repository on the remote machine..."
-ssh -t "$ssh_target" 'git clone https://github.com/vtno/docker-registry.git ~/.docker-registry'
+ssh -t "$ssh_target" 'if [ -d ~/.docker-registry ]; then echo ".docker-registry dir exists"; else git clone https://github.com/vtno/docker-registry.git ~/.docker-registry; fi'
 echo "Decrypting the registry credentials..."
 ./crypto.sh dec
 echo "Copying the registry credentials to the remote machine..."
