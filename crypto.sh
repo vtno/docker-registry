@@ -1,18 +1,17 @@
 #! /usr/bin/env bash
 
 function enc() {
-  prompt_if_file_exists registry_username.txt.enc
-  prompt_if_file_exists registry_password_hash.txt.enc
-  htpasswd -bnBC 10 "" $(cat registry_password.txt) | tr -d ':\n' > registry_password_hash.txt
-  zypher encrypt -o registry_username.txt.enc -f registry_username.txt
-  zypher encrypt -o registry_password_hash.txt.enc -f registry_password_hash.txt
+  prompt_if_file_exists .env.enc
+  zypher encrypt -o .env.enc -f .env
 }
 
 function dec() {
-  prompt_if_file_exists registry_username.txt
-  prompt_if_file_exists registry_password_hash.txt
-  zypher decrypt -o registry_username.txt -f registry_username.txt.enc
-  zypher decrypt -o registry_password_hash.txt -f registry_password_hash.txt.enc
+  prompt_if_file_exists .env
+  zypher decrypt -o .env -f .env.enc
+}
+
+function hash() {
+  htpasswd -bnBC 10 "" "$1" | tr -d ':\n'
 }
 
 function prompt_if_file_exists() {
@@ -26,7 +25,10 @@ function prompt_if_file_exists() {
 }
 
 function help() {
-  echo "Usage: crypto.sh [enc|dec]"
+  echo "Usage: crypto.sh [enc|dec|hash] [plain-password]"
+  echo "Example: crypto.sh enc"
+  echo "Example: crypto.sh dec"
+  echo "Example: crypto.sh hash mypassword"
 }
 
 if ! command -v zypher &> /dev/null; then
@@ -41,6 +43,9 @@ case $1 in
     ;;
   dec)
     dec
+    ;;
+  hash)
+    hash $2
     ;;
   *)
     help

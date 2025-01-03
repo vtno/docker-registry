@@ -16,10 +16,11 @@ fi
 ssh_target=$1
 domain=$2
 
+echo "Source the environment variables..."
+source .env
+
 echo "Cloning the repository on the remote machine..."
 ssh -t "$ssh_target" 'if [ -d ~/.docker-registry ]; then echo ".docker-registry dir exists"; else git clone https://github.com/vtno/docker-registry.git ~/.docker-registry; fi'
-echo "Decrypting the registry credentials..."
-./crypto.sh dec
 echo "Copying the registry credentials to the remote machine..."
 scp .env "$ssh_target:~/.docker-registry/"
 echo "Starting the registry..."
@@ -28,7 +29,7 @@ echo "Health check..."
 
 # loop until the registry is up for 10 seconds with 1 second pause
 for i in {1..10}; do
-  if curl -s -o /dev/null -w "%{http_code}" "https://$domain" | grep -q 200; then
+if curl -u "$USERNAME":"$PLAIN_PASSWORD" -s -o /dev/null -w "%{http_code}" "https://$domain" | grep -q 200; then
     echo "Registry is up!"
     exit 0
   fi
