@@ -1,4 +1,4 @@
-{$DOMAIN}:8443 {
+{$DOMAIN}:443 {
 	# Enable basic authentication
 	basic_auth {
 		{$USERNAME} {$PASSWORD}
