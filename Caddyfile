@@ -1,0 +1,13 @@
+{
+	acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+{$DOMAIN}:8443 {
+	# Enable basic authentication
+	basic_auth {
+		{$USERNAME} {$PASSWORD}
+	}
+
+	# Reverse proxy to the upstream service
+	reverse_proxy http://registry:5000
+}
